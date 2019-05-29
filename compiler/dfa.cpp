@@ -11,14 +11,43 @@ dfa::dfa(string myfile)
 	fin.open(myfile);
 	string myLine;
 	string wordBuild = "";
+	int i = 0;
 
 	if (!fin)
 	{
 		throw logic_error("Cannot open input file.\n");
 	}
 
-	while (fin.peek() != EOF) {
+	while (fin.peek() != EOF) 
+	{
 		getline(fin, myLine);
+
+		while (i < myLine.length())
+		{
+			if (isOperator(myLine[i]))
+			{
+				operationType(to_string(myLine[i++]));
+			}
+			else if (myLine[i] == '=')
+			{
+				assignmentType(to_string(myLine[i++]));
+			}
+			else if (myLine[i] == '\n')
+			{
+				newline_characterType(to_string(myLine[i++]));
+			}
+			else if (isdigit(myLine[i]))
+			{
+				wordBuild = myLine[i++];
+
+				while (isdigit(myLine[i]))
+				{
+					wordBuild.append(to_string(myLine[i++]));
+				}
+				variableType(wordBuild);
+			}
+
+		}
 		
 		for (int i = 0; i < myLine.length(); i++) {
 			if (wordBuild.empty() && myLine[i] == '=') {
@@ -62,4 +91,9 @@ dfa::dfa(string myfile)
 	}
 
 
+}
+
+bool dfa::isOperator(char c) const
+{
+	return (c == '+' || c == '-' || c == '*' || c == '/');
 }

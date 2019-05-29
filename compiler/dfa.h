@@ -13,7 +13,6 @@ struct MyStruct
 {
 	string word;
 	types attributes;	
-
 };
 
 class dfa 
@@ -27,25 +26,11 @@ public:
 	void assignmentType();
 	void newline_characterType();
 
-
-
-
-
 private:
 	MyStruct tempLabel;
 	queue<MyStruct> container;
-
-
-	
-
-
-
-
+	bool isOperator(char) const;
 };
-
-
-
-
 
 #endif // !DFA_H
 
