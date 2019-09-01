@@ -21,25 +21,22 @@
 //********************************************************************************
 
 #include "dfa.h"
-#include<iostream>
-#include<queue>
-#include<list>
-#include<string>
+
 using namespace std;
 
 dfa::dfa(std::queue<char, list<char>>& input)
 {
-	pointerToQueue = &input;
-	while (!input.empty) {
-		wordcontainer.word = " ";
+	isTrap = false;
+	while (!input.empty()) {
+		wordcontainer.word = "";
 		if (isalpha(input.front()))
-			state1();
+			state1(input);
 		else if (isdigit(input.front()))
-			state3();
-		else if (input.front() == '/n')
-			state4();
+			state3(input);
+		else if (input.front() == '\n')
+			state4(input);
 		else if (input.front() == '=')
-			state5();
+			state5(input);
 		else
 		{
 			switch (input.front())
@@ -48,10 +45,10 @@ dfa::dfa(std::queue<char, list<char>>& input)
 			case '-':
 			case '/':
 			case '*':
-				state2();
+				state2(input);
 				break;
 			default:
-				trap();
+				trap(input);
 
 			}
 		}
@@ -59,68 +56,74 @@ dfa::dfa(std::queue<char, list<char>>& input)
 	}
 }
 
-deque<MyStruct> dfa::getWordlist()
+queue<MyStruct>& dfa::getWordlist()
 {
 	return wordlist;
+}
+
+bool dfa::getIsTrap() const
+{
+	return isTrap;
 }
 
 // state1() 
 // Aaccepts identifiers up to the max length defined in the .h file const.
 // The struct containing the token and enum identifier are pushed onto wordlist.
 
-void dfa::state1()
+void dfa::state1(queue<char, list<char>> &input)
 {
-	for (int i = 0; i < Max_Word && (isalpha((*pointerToQueue).front()) || (isdigit((*pointerToQueue).front()))); ++i)
+	for (int i = 0; i < Max_Word && (isalpha(input.front()) ||  
+		                                 isdigit(input.front())); i++)
 	{
-		temp = (*pointerToQueue).front();
+		temp = input.front();
 		wordcontainer.word.append(temp);
-		(*pointerToQueue).pop();
+		input.pop();
 	}
 	wordcontainer.attributes = identifier;
-	wordlist.push_back(wordcontainer);
+	wordlist.push(wordcontainer);
 }
 
 //state2()
 // Accepts the operators +, -, *, /
 // The struct containing the token and enum integer are pushed onto wordlist.
 
-void dfa::state2()
+void dfa::state2(queue<char, list<char>> &input)
 {
-	temp = (*pointerToQueue).front();
+	temp = input.front();
 	wordcontainer.word.append(temp);
 	wordcontainer.attributes = operation;
-	wordlist.push_back(wordcontainer);
-	(*pointerToQueue).pop();
+	wordlist.push(wordcontainer);
+	input.pop();
 
 }
 
 //state3()
 // Accepts integers up to the max length defined in the .h file const.
 // The struct containing the token and enum operation are pushed onto wordlist.
-void dfa::state3()
+void dfa::state3(queue<char, list<char>> &input)
 {
-	for (int i = 0; i < Max_Digits && (isdigit((*pointerToQueue).front())); ++i)
+	for (int i = 0; i < Max_Digits && (isdigit(input.front())); ++i)
 	{
-		temp = (*pointerToQueue).front();
+		temp = input.front();
 		wordcontainer.word.append(temp);
-		(*pointerToQueue).pop();
+		input.pop();
 
     }
 	wordcontainer.attributes = integer;
-	wordlist.push_back(wordcontainer);
+	wordlist.push(wordcontainer);
 }
 
 //state4()
 // Accepts the new line character '\n', marking the end of a statement line.
 // The struct containing the token and enum newline are pushed onto wordlist.
 
-void dfa::state4()
+void dfa::state4(queue<char, list<char>> &input)
 {
-	temp = (*pointerToQueue).front();
+	temp = input.front();
 	wordcontainer.word.append(temp);
 	wordcontainer.attributes = newlineChar;
-	wordlist.push_back(wordcontainer);
-	(*pointerToQueue).pop();
+	wordlist.push(wordcontainer);
+	input.pop();
 	
 }
 
@@ -128,13 +131,13 @@ void dfa::state4()
 // Aaccepts the assignment character '='.
 // The struct containing the token and enum assign are pushed onto wordlist.
 
-void dfa::state5()
+void dfa::state5(queue<char, list<char>> &input)
 {
-	temp = (*pointerToQueue).front();
+	temp = input.front();
 	wordcontainer.word.append(temp);
 	wordcontainer.attributes = assignment;
-	wordlist.push_back(wordcontainer);
-	(*pointerToQueue).pop();
+	wordlist.push(wordcontainer);
+	input.pop();
 
 	
 }
@@ -143,14 +146,15 @@ void dfa::state5()
 // When a disallowed character is read from input, this method
 // outputs the rest of the queue to screen and exits.
 
-void dfa::trap()
+void dfa::trap(queue<char, list<char>> &input)
 {
+	isTrap = true;
 	cout << "Character not allowed" << endl;
-	while (!(*pointerToQueue).empty())
+	while (!input.empty())
 	{
-		cout << (*pointerToQueue).front();
-		(*pointerToQueue).pop();
+		cout << input.front();
+		input.pop();
 	}
 	cout << endl;
-	exit(1);
+	//exit(1);
 }

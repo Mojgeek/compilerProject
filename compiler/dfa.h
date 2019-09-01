@@ -23,10 +23,11 @@
 #ifndef DFA_H
 #define DFA_H
 
+#include <iostream>
 #include<queue>
 #include<list>
 #include<string>
-#include<deque>
+
 using namespace std;
 
 const int Max_Word = 12; // max length of identifier
@@ -36,7 +37,7 @@ const int Max_Digits = 12; // max length of integer
 //  newline, and assign.  The other attributes are used by the PDA object.
 
 enum types {
-	identifier, integer, assignment , operation , newlineChar, factor , expression, term, program, statement, BOTTOM_SYMBOL
+	identifier, integer, assignment , operation , newlineChar, factor , expression, statement, BOTTOM_SYMBOL
 };
 // The tokens to be pushed and popped from the deque are of the type MyStruct
 // and store both the token and its described enum attribute.
@@ -58,18 +59,19 @@ public:
 	
 	// getwordlist method
 	// returns a reference to the wordlist deque
-	deque<MyStruct> getWordlist();
+	queue<MyStruct> &getWordlist();
+	bool getIsTrap() const;
 
 private:
-	void state1(); // accepts identifiers
-	void state2(); // accepts operations
-	void state3(); // accepts integers
-	void state4(); // accepts new line characters
-	void state5(); // accepts assignment operator
-	void trap();
-	queue<char, list<char>> *pointerToQueue; // This is a pointer to the queue of input to be assigned to it inside the constructor 
-	                                         // Therefore, there's no need for the  input to be passed in as arguments to each state
-	deque<MyStruct> wordlist; 
+	void state1(queue<char, list<char>> &input); // accepts identifiers
+	void state2(queue<char, list<char>> &input); // accepts operations
+	void state3(queue<char, list<char>> &input); // accepts integers
+	void state4(queue<char, list<char>> &input); // accepts new line characters
+	void state5(queue<char, list<char>> &input); // accepts assignment operator
+	void trap(queue<char, list<char>> &input);
+	bool isTrap;
+	
+	queue<MyStruct> wordlist; 
 	MyStruct wordcontainer; // temporary holding struct to be pushed in to the deque
 	string temp;
 };

@@ -32,26 +32,22 @@
 //********************************************************************************
 
 
-#include<iostream>
-#include<string>
 #include"dfa.h"
 #include"pda.h"
-#include<queue>
-#include<deque>
-#include<list>
 #include<fstream>
 
 using namespace std;
-const string input_file = "Input.txt";
+const string input_file = "Input_File.txt";
 
 int main() {
 
-	queue<char, list<char>> queueInstance;
+	queue<char, list<char>> input;
+	
 
 	ifstream file;
 	string tempstr;
 
-	file.open("Input.txt");
+	file.open(input_file);
 
 	if (!file) 
 	{
@@ -64,19 +60,25 @@ int main() {
 
 		// Each char on a line of the input file is read and 
 		// pushed into a queue.
-		for (int i = 0; i < tempstr.length(); ++i)
+		for (auto it = tempstr.begin(); it != tempstr.end(); ++it)
 		{
 			// Spaces are truncated.
-			if (tempstr[i] == ' ')
+			if (*it == ' ')
 				continue;
-			queueInstance.push(i);
+
+			input.push(*it);
 		}
 		// '\n' marks the end of each statement line.
 		// PDA will expect a newline token to close each
 		// statement
-		queueInstance.push('/n');
+		input.push('\n');
 	}
 	file.close();
-	dfa labeling(queueInstance);
+	dfa compilerDFA(input);
+	if (compilerDFA.getIsTrap()) return 1;
+	pda compilerPDA(compilerDFA.getWordlist());
+
+	system("pause");
+	return 0;
 
 }
